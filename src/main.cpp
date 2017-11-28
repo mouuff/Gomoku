@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include "gomoku.h"
 
 int main()
 {
