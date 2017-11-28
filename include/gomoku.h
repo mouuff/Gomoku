@@ -1,6 +1,4 @@
-#ifndef GOMOKU_H_
-#define GOMOKU_H_
 
+#pragma once
 
-
-#endif
+#include "Protocol.hpp"

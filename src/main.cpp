@@ -4,6 +4,6 @@
 
 int main()
 {
-  std::cout << "hello world" << std::endl;
+  Protocol* protocol = new Protocol();
   return 0;
 }
