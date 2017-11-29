@@ -3,16 +3,13 @@
 #include <fstream>
 #include <string>
 #include "gomoku.h"
+#include "Game.hpp"
 
 int main()
 {
   std::string tmp;
-  Protocol* protocol = new Protocol();
+  Game* game = new Game();
+  Protocol* protocol = new Protocol((IGame*)game);
   protocol->readLoop();
-  /*
-  tmp = protocol->rawRecv();
-  protocol->rawSend("MESSAGE got " + tmp);
-  protocol->rawSend("OK");
-  */
   return 0;
 }

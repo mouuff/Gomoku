@@ -6,8 +6,13 @@
 #include "Protocol.hpp"
 #include "misc.h"
 
-Protocol::Protocol()
+Protocol::Protocol(IGame* _game)
 {
+  this->game = _game;
+  if (this->game == nullptr)
+  {
+    throw std::invalid_argument("Error: null IGame");
+  }
 }
 
 Protocol::~Protocol()
@@ -45,7 +50,6 @@ void Protocol::readLoop()
   {
     std::string cmd = this->rawRecv();
     std::vector<std::string> elems = split(cmd, ' ');
-    //std::cout << "MESSAGE x" << vector.at(0) << "x"<< std::endl;
     std::string key = elems.at(0);
     if (input_map.find(key) == input_map.end())
     {
