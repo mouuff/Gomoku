@@ -5,18 +5,22 @@
 #include <string>
 #include <vector>
 
+class IGame;
+
 class Protocol
 {
+private:
+  IGame* game;
 public:
-  Protocol();
+  Protocol(IGame*);
   virtual ~Protocol();
-  void rawSend(std::string const & cmd);
   void log(std::string const & cmd);
-  std::string rawRecv();
   void readLoop();
   void inputStart(std::string const &);
   void inputAbout(std::string const &);
   void inputInfo(std::string const &);
+  std::string rawRecv();
+  void rawSend(std::string const & cmd);
 };
 
 typedef void(Protocol::*t_command_input)(std::string const &);
