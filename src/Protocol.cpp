@@ -36,10 +36,33 @@ void Protocol::inputStart(std::string const & str)
   this->rawSend("OK");
 }
 
+void Protocol::inputAbout(std::string const & str)
+{
+  this->rawSend("name=\"pd35-Brain\", version=\"1.0\", author=\"pd35 team\", country=\"France\"");
+}
+
+void Protocol::inputInfo(std::string const & str)
+{
+  this->rawSend(str);
+  std::map<std::string, t_command_info> info_map = {
+    {"timeout_turn", NULL},
+    {"timeout_match", NULL},
+    {"max_memory", NULL},
+    {"time_left", NULL},
+    {"game_type", NULL},
+    {"rule", NULL},
+    {"evaluate", NULL},
+    {"folder", NULL}
+  };
+  std::vector<std::string> elems = split(str, ' ');
+}
+
 void Protocol::readLoop()
 {
   std::map<std::string, t_command_input> input_map = {
-    {"START", &Protocol::inputStart}
+    {"START", &Protocol::inputStart},
+    {"ABOUT", &Protocol::inputAbout},
+    {"INFO", &Protocol::inputInfo}
   };
   while (true)
   {

@@ -15,6 +15,9 @@ public:
   std::string rawRecv();
   void readLoop();
   void inputStart(std::string const &);
+  void inputAbout(std::string const &);
+  void inputInfo(std::string const &);
 };
 
 typedef void(Protocol::*t_command_input)(std::string const &);
+typedef void(Protocol::*t_command_info)();
