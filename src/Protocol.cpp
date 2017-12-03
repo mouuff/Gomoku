@@ -90,6 +90,11 @@ void Protocol::inputStart(std::string const & str)
     this->rawSend("OK");
 }
 
+void Protocol::inputRestart(std::string const & str)
+{
+  if (this->init(size_x, size_y))
+    this->rawSend("OK");
+}
 
 void Protocol::inputTurn(std::string const & str)
 {
@@ -126,7 +131,6 @@ void Protocol::inputAbout(std::string const & str)
 void Protocol::inputInfo(std::string const & str)
 {
   std::vector<std::string> elems = split(str, ' ');
-
   if (elems.size() != 2) {
     this->log("Bad info: " + str);
   }
@@ -154,13 +158,58 @@ void Protocol::inputInfo(std::string const & str)
     this->log("Unknown info: " + name);
 }
 
+void Protocol::inputBoard(std::string const & str)
+{
+  std::string last;
+  std::vector<std::string> elems;
+  while (true)
+  {
+    last = this->rawRecv();
+    if (last == "DONE")
+      break;
+    elems = split(last, ',');
+    if (elems.size() != 3) {
+      this->log("Bad board: " + last);
+      return;
+    }
+    Point pt;
+    pt.x = my_stol(elems.at(0));
+    pt.y = my_stol(elems.at(1));
+    int stone = my_stol(elems.at(2));
+    if (stone == 1) {
+      mapGet(pt) = Tile::OWN;
+    }
+    else if (stone == 2) {
+      mapGet(pt) = Tile::OPPONENT;
+    }
+  }
+  this->play();
+}
+
+void Protocol::inputTakeback(std::string const & str)
+{
+  std::vector<std::string> elems = split(str, ',');
+  if (elems.size() != 2) {
+    this->log("Bad takeback: " + str);
+    return;
+  }
+  Point pt;
+  pt.x = my_stol(elems.at(0));
+  pt.y = my_stol(elems.at(1));
+  this->mapGet(pt) = Tile::EMPTY;
+  this->rawSend("OK");
+}
+
 void Protocol::readLoop()
 {
   std::map<std::string, t_command_input> input_map = {
     {"START", &Protocol::inputStart},
+    {"RESTART", &Protocol::inputRestart},
     {"BEGIN", &Protocol::inputBegin},
     {"ABOUT", &Protocol::inputAbout},
     {"TURN", &Protocol::inputTurn},
+    {"BOARD", &Protocol::inputBoard},
+    {"TAKEBACK", &Protocol::inputTakeback},
     {"INFO", &Protocol::inputInfo}
   };
   std::string cmd, key;

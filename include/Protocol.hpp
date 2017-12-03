@@ -50,6 +50,9 @@ public:
   void inputInfo(std::string const &);
   void inputBegin(std::string const &);
   void inputTurn(std::string const &);
+  void inputBoard(std::string const &);
+  void inputTakeback(std::string const &);
+  void inputRestart(std::string const &);
 };
 
 typedef void(Protocol::*t_command_input)(std::string const &);
