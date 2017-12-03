@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include "Protocol.hpp"
+#include "Point.hpp"
 #include "misc.h"
 
 Protocol::Protocol(IGame* _game)
@@ -36,7 +37,7 @@ std::string Protocol::rawRecv()
   return line;
 }
 
-bool Protocol::initMap(int size_x, int size_y)
+bool Protocol::init(int size_x, int size_y)
 {
   //this->log("start size: " + size_x + ", " + size_y);
   if (size_x < MIN_SIZE || size_y < MIN_SIZE)
@@ -52,6 +53,7 @@ bool Protocol::initMap(int size_x, int size_y)
     }
     map.push_back(buff);
   }
+  game->start(this);
   return true;
 }
 
@@ -63,9 +65,10 @@ Tile Protocol::mapGet(int x, int y)
 void Protocol::inputStart(std::string const & str)
 {
   long size = my_stol(str);
-  if (this->initMap(size, size))
+  if (this->init(size, size))
     this->rawSend("OK");
 
+  /*
   for (int x = 0; x < size_x; x += 1) {
     std::string line;
     for (int y = 0; y < size_y; y += 1) {
@@ -73,12 +76,19 @@ void Protocol::inputStart(std::string const & str)
     }
     this->log(line);
   }
+  */
 }
 
+void Protocol::play()
+{
+  this->rawSend("1,2");
+  //Point move = game->play();
+  //this->rawSend(std::to_string(move.x) + "," + std::to_string(move.y));
+}
 
 void Protocol::inputBegin(std::string const & str)
 {
-  
+  play();
 }
 
 void Protocol::inputAbout(std::string const & str)
@@ -105,6 +115,8 @@ void Protocol::inputInfo(std::string const & str)
     this->max_memory = n_info;
   else if (name == "time_left")
     this->time_left = n_info;
+  else if (name == "game_type")
+    this->game_type = n_info;
   else if (name == "rule")
     this->rule = n_info;
   else if (name == "evaluate")
@@ -123,19 +135,23 @@ void Protocol::readLoop()
     {"ABOUT", &Protocol::inputAbout},
     {"INFO", &Protocol::inputInfo}
   };
+  std::string cmd, key;
+  std::vector<std::string> elems;
   while (true)
   {
-    std::string cmd = this->rawRecv();
-    std::vector<std::string> elems = split(cmd, ' ');
-    std::string key = elems.at(0);
+    cmd = this->rawRecv();
+    if (cmd == "")
+      continue;
+    elems = split(cmd, ' ');
+    key = elems.at(0);
     if (input_map.find(key) == input_map.end())
     {
       this->log("Not found key: " + key);
     }
     else
     {
-      std::string sub = cmd.substr(key.length() + 1);
-      (this->*(input_map[key]))(sub);
+      std::string res = cmd.substr(key.length());
+      (this->*(input_map[key]))(res);
     }
   }
 }

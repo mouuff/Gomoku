@@ -3,6 +3,8 @@
 #include "Protocol.hpp"
 #include "Point.hpp"
 
+class Protocol;
+
 class IGame
 {
 public:

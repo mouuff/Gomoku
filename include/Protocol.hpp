@@ -4,10 +4,9 @@
 #include <thread>
 #include <string>
 #include <vector>
+#include "IGame.hpp"
 
 #define MIN_SIZE 5
-
-class IGame;
 
 enum Tile : int {
   EMPTY = 0,
@@ -17,7 +16,7 @@ enum Tile : int {
 
 class Protocol
 {
-private:
+protected:
   IGame* game;
   // Vars:
   int size_x;
@@ -32,8 +31,11 @@ private:
   long rule;
   long evaluate;
   std::string folder;
-private:
-  bool initMap(int size_x, int size_y);
+protected:
+  bool init(int size_x, int size_y);
+  std::string rawRecv();
+  void rawSend(std::string const & cmd);
+  void play();
 public:
   Protocol(IGame*);
   virtual ~Protocol();
@@ -43,8 +45,7 @@ public:
   void inputStart(std::string const &);
   void inputAbout(std::string const &);
   void inputInfo(std::string const &);
-  std::string rawRecv();
-  void rawSend(std::string const & cmd);
+  void inputBegin(std::string const &);
 };
 
 typedef void(Protocol::*t_command_input)(std::string const &);

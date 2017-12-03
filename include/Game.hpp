@@ -5,6 +5,8 @@
 
 class Game : public IGame
 {
+protected:
+  Protocol* protocol;
 public:
   Game();
   virtual ~Game();
