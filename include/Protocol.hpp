@@ -36,10 +36,12 @@ protected:
   std::string rawRecv();
   void rawSend(std::string const & cmd);
   void play();
+  void logMap();
 public:
   Protocol(IGame*);
   virtual ~Protocol();
-  Tile mapGet(int x, int y);
+  Tile& mapGet(int x, int y);
+  Tile& mapGet(Point const & pt);
   void log(std::string const & cmd);
   void readLoop();
   void inputStart(std::string const &);

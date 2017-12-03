@@ -46,9 +46,9 @@ bool Protocol::init(int size_x, int size_y)
   this->size_y = size_y;
   std::vector<Tile> buff;
   map.clear();
-  for (int x = 0; x < size_x; x += 1) {
+  for (int y = 0; y < size_y; y += 1) {
     buff.clear();
-    for (int y = 0; y < size_y; y += 1) {
+    for (int x = 0; x < size_x; x += 1) {
       buff.push_back(Tile::EMPTY);
     }
     map.push_back(buff);
@@ -57,9 +57,22 @@ bool Protocol::init(int size_x, int size_y)
   return true;
 }
 
-Tile Protocol::mapGet(int x, int y)
-{
+Tile& Protocol::mapGet(int x, int y) {
   return map.at(x).at(y);
+}
+
+Tile& Protocol::mapGet(Point const & pt) {
+  return this->mapGet(pt.x, pt.y);
+}
+
+void Protocol::logMap() {
+  for (int y = 0; y < size_y; y += 1) {
+    std::string line;
+    for (int x = 0; x < size_x; x += 1) {
+      line += std::to_string((int)mapGet(x, y)) + ", ";
+    }
+    this->log(line);
+  }
 }
 
 void Protocol::inputStart(std::string const & str)
@@ -67,23 +80,14 @@ void Protocol::inputStart(std::string const & str)
   long size = my_stol(str);
   if (this->init(size, size))
     this->rawSend("OK");
-
-  /*
-  for (int x = 0; x < size_x; x += 1) {
-    std::string line;
-    for (int y = 0; y < size_y; y += 1) {
-      line += std::to_string((int)mapGet(x, y)) + ", ";
-    }
-    this->log(line);
-  }
-  */
 }
 
 void Protocol::play()
 {
-  this->rawSend("1,2");
-  //Point move = game->play();
-  //this->rawSend(std::to_string(move.x) + "," + std::to_string(move.y));
+  Point move = game->play();
+  this->mapGet(move) = OWN;
+  this->logMap();
+  this->rawSend(std::to_string(move.x) + "," + std::to_string(move.y));
 }
 
 void Protocol::inputBegin(std::string const & str)
