@@ -57,6 +57,14 @@ bool Protocol::init(int size_x, int size_y)
   return true;
 }
 
+Point Protocol::mapSize() const
+{
+  Point ret;
+  ret.x = size_x;
+  ret.y = size_y;
+  return ret;
+}
+
 Tile& Protocol::mapGet(int x, int y) {
   return map.at(x).at(y);
 }
@@ -80,6 +88,21 @@ void Protocol::inputStart(std::string const & str)
   long size = my_stol(str);
   if (this->init(size, size))
     this->rawSend("OK");
+}
+
+
+void Protocol::inputTurn(std::string const & str)
+{
+  std::vector<std::string> elems = split(str, ',');
+  if (elems.size() != 2) {
+    this->log("Bad turn: " + str);
+    return;
+  }
+  Point pt;
+  pt.x = my_stol(elems.at(0));
+  pt.y = my_stol(elems.at(1));
+  this->mapGet(pt) = OPPONENT;
+  this->play();
 }
 
 void Protocol::play()
@@ -137,6 +160,7 @@ void Protocol::readLoop()
     {"START", &Protocol::inputStart},
     {"BEGIN", &Protocol::inputBegin},
     {"ABOUT", &Protocol::inputAbout},
+    {"TURN", &Protocol::inputTurn},
     {"INFO", &Protocol::inputInfo}
   };
   std::string cmd, key;

@@ -40,6 +40,7 @@ protected:
 public:
   Protocol(IGame*);
   virtual ~Protocol();
+  Point mapSize() const;
   Tile& mapGet(int x, int y);
   Tile& mapGet(Point const & pt);
   void log(std::string const & cmd);
@@ -48,6 +49,7 @@ public:
   void inputAbout(std::string const &);
   void inputInfo(std::string const &);
   void inputBegin(std::string const &);
+  void inputTurn(std::string const &);
 };
 
 typedef void(Protocol::*t_command_input)(std::string const &);
