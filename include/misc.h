@@ -4,4 +4,5 @@
 #include <iostream>
 #include <string>
 
-std::vector<std::string> split(const std::string & s, char delim);
+std::vector<std::string> split(std::string const & s, char delim);
+long my_stol(std::string const & s);
