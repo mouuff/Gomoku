@@ -37,26 +37,6 @@ std::string Protocol::rawRecv()
   return line;
 }
 
-bool Protocol::init(int size_x, int size_y)
-{
-  //this->log("start size: " + size_x + ", " + size_y);
-  if (size_x < MIN_SIZE || size_y < MIN_SIZE)
-    return false;
-  this->size_x = size_x;
-  this->size_y = size_y;
-  std::vector<Tile> buff;
-  map.clear();
-  for (int y = 0; y < size_y; y += 1) {
-    buff.clear();
-    for (int x = 0; x < size_x; x += 1) {
-      buff.push_back(Tile::EMPTY);
-    }
-    map.push_back(buff);
-  }
-  game->start(this);
-  return true;
-}
-
 Point Protocol::mapSize() const
 {
   Point ret;
@@ -83,10 +63,42 @@ void Protocol::logMap() {
   }
 }
 
+bool Protocol::init(int size_x, int size_y)
+{
+  //this->log("start size: " + size_x + ", " + size_y);
+  if (size_x < MIN_SIZE || size_y < MIN_SIZE)
+    return false;
+  this->size_x = size_x;
+  this->size_y = size_y;
+  std::vector<Tile> buff;
+  map.clear();
+  for (int y = 0; y < size_y; y += 1) {
+    buff.clear();
+    for (int x = 0; x < size_x; x += 1) {
+      buff.push_back(Tile::EMPTY);
+    }
+    map.push_back(buff);
+  }
+  game->start(this);
+  return true;
+}
+
 void Protocol::inputStart(std::string const & str)
 {
   long size = my_stol(str);
   if (this->init(size, size))
+    this->rawSend("OK");
+}
+
+void Protocol::inputRectstart(std::string const & str)
+{
+  std::vector<std::string> elems = split(str, ',');
+  if (elems.size() != 2) {
+    this->log("Bad rectstart: " + str);
+  }
+  int width = my_stol(elems.at(0));
+  int height = my_stol(elems.at(1));
+  if (this->init(width, height))
     this->rawSend("OK");
 }
 
@@ -205,6 +217,7 @@ void Protocol::readLoop()
   std::map<std::string, t_command_input> input_map = {
     {"START", &Protocol::inputStart},
     {"RESTART", &Protocol::inputRestart},
+    {"RECTSTART", &Protocol::inputRectstart},
     {"BEGIN", &Protocol::inputBegin},
     {"ABOUT", &Protocol::inputAbout},
     {"TURN", &Protocol::inputTurn},

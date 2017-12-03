@@ -46,13 +46,14 @@ public:
   void log(std::string const & cmd);
   void readLoop();
   void inputStart(std::string const &);
+  void inputRestart(std::string const &);
+  void inputRectstart(std::string const &);
   void inputAbout(std::string const &);
   void inputInfo(std::string const &);
   void inputBegin(std::string const &);
   void inputTurn(std::string const &);
   void inputBoard(std::string const &);
   void inputTakeback(std::string const &);
-  void inputRestart(std::string const &);
 };
 
 typedef void(Protocol::*t_command_input)(std::string const &);
