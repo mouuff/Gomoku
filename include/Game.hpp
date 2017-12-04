@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "Protocol.hpp"
 #include "IGame.hpp"
 

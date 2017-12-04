@@ -1,6 +1,4 @@
 
-cmake_minimum_required(VERSION 3.9)
-
 include_directories(include)
 
 project (pbrain-pd35 C CXX)
