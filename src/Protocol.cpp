@@ -116,8 +116,8 @@ void Protocol::inputTurn(std::string const & str)
     return;
   }
   Point pt;
-  pt.x = my_stol(elems.at(0));
-  pt.y = my_stol(elems.at(1));
+  pt.x = (char)my_stol(elems.at(0));
+  pt.y = (char)my_stol(elems.at(1));
   this->mapGet(pt) = OPPONENT;
   this->play();
 }
@@ -185,8 +185,8 @@ void Protocol::inputBoard(std::string const & str)
       return;
     }
     Point pt;
-    pt.x = my_stol(elems.at(0));
-    pt.y = my_stol(elems.at(1));
+    pt.x = (char)my_stol(elems.at(0));
+    pt.y = (char)my_stol(elems.at(1));
     int stone = my_stol(elems.at(2));
     if (stone == 1) {
       mapGet(pt) = Tile::OWN;
@@ -206,8 +206,8 @@ void Protocol::inputTakeback(std::string const & str)
     return;
   }
   Point pt;
-  pt.x = my_stol(elems.at(0));
-  pt.y = my_stol(elems.at(1));
+  pt.x = (char)my_stol(elems.at(0));
+  pt.y = (char)my_stol(elems.at(1));
   this->mapGet(pt) = Tile::EMPTY;
   this->rawSend("OK");
 }
