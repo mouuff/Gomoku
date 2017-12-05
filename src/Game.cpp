@@ -61,13 +61,13 @@ Point Game::directionToPoint(Dir dir) const
   return pt;
 }
 
-char Game::evaluateDir(Point origin, Dir dir, Tile origin_tile)
+int Game::evaluateDir(Point origin, Dir dir, Tile origin_tile)
 {
   Point ptdir = this->directionToPoint(dir);
   Point pos = origin;
   Point size = protocol->mapSize();
   Tile buff;
-  char score = 0;
+  int score = 0;
   if (origin_tile == EMPTY)
     throw std::runtime_error("Evaluate empty pos");
   //protocol->log("Debug: " + std::to_string(pos.x) + ", " + std::to_string(pos.y));
@@ -93,10 +93,10 @@ char Game::evaluateDir(Point origin, Dir dir, Tile origin_tile)
   return score;
 }
 
-char Game::evaluate(Point pt, Tile tl)
+int Game::evaluate(Point pt, Tile tl)
 {
-  char max = 0;
-  char buff;
+  int max = 0;
+  int buff;
   buff = this->evaluateDir(pt, NORTH, tl) + this->evaluateDir(pt, SOUTH, tl);
   if (buff > max)
     max = buff;
@@ -136,7 +136,7 @@ Point Game::play()
   for (curr.y = 0; curr.y < size.y; curr.y += 1) {
     for (curr.x = 0; curr.x < size.x; curr.x += 1) {
       if (protocol->mapGet(curr) == EMPTY) {
-        int buff = evaluate(curr, OWN);
+        int buff = evaluate(curr, OPPONENT);
         if (buff > max)
         {
           pt = curr;
