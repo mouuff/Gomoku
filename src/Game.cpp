@@ -112,6 +112,17 @@ char Game::evaluate(Point pt, Tile tl)
   return max;
 }
 
+Point Game::randomEmptyPoint()
+{
+  Point pt;
+  do {
+    if (true)
+    pt.x = my_randint(0, protocol->mapSize().x - 1);
+    pt.y = my_randint(0, protocol->mapSize().y - 1);
+  } while (protocol->mapGet(pt) != Tile::EMPTY);
+  return pt;
+}
+
 Point Game::play()
 {
   Point pt = Point();
@@ -119,11 +130,23 @@ Point Game::play()
     std::cout << "MESSAGE protocol not set in game" << std::endl;
     return pt;
   }
-  protocol->log("start find");
-  do {
-    if (true)
-    pt.x = my_randint(0, protocol->mapSize().x - 1);
-    pt.y = my_randint(0, protocol->mapSize().y - 1);
-  } while (protocol->mapGet(pt) != Tile::EMPTY);
+  Point size = protocol->mapSize();
+  Point curr;
+  char max = 0;
+  for (curr.y = 0; curr.y < size.y; curr.y += 1) {
+    for (curr.x = 0; curr.x < size.x; curr.x += 1) {
+      if (protocol->mapGet(curr) == EMPTY) {
+        int buff = evaluate(curr, OWN);
+        if (buff > max)
+        {
+          pt = curr;
+          max = buff;
+        }
+      }
+    }
+  }
+  if (max == 0) {
+    return randomEmptyPoint();
+  }
   return pt;
 }

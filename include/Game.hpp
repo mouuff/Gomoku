@@ -27,6 +27,7 @@ public:
   void start(Protocol*);
   void end();
   Point play();
+  Point randomEmptyPoint();
   char evaluateDir(Point pt, Dir dir, Tile origin_tile);
   char evaluate(Point pt, Tile origin_tile);
   Point directionToPoint(Dir dir) const;
