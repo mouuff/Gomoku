@@ -124,6 +124,7 @@ void Protocol::inputTurn(std::string const & str)
   this->mapGet(pt) = OPPONENT;
 
   //DEBUG:
+  //this->logMap();
   this->log("evaluate: " + std::to_string((int)((Game*)game)->evaluate(pt, OPPONENT)));
   //DEBUG
   this->play();

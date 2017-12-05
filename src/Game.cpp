@@ -67,15 +67,24 @@ char Game::evaluateDir(Point origin, Dir dir, Tile origin_tile)
   Point pos = origin;
   Point size = protocol->mapSize();
   char score = 0;
+  bool gap = false;
   if (origin_tile == EMPTY)
     throw std::runtime_error("Evaluate empty pos");
+  //protocol->log("Debug: " + std::to_string(pos.x) + ", " + std::to_string(pos.y));
   for (int x = 0; x < 4; x += 1) {
     pos.x += ptdir.x;
     pos.y += ptdir.y;
     if (pos.x < 0 || pos.x >= size.x || pos.y < 0 || pos.y >= size.y)
       break;
     if (protocol->mapGet(pos) == origin_tile) {
-      score += 1;
+      score += 2;
+      if (gap) {
+        gap = false;
+        score += 1;
+      }
+    }
+    else if (gap == false) {
+      gap = true;
     }
     else {
       break;
@@ -84,20 +93,20 @@ char Game::evaluateDir(Point origin, Dir dir, Tile origin_tile)
   return score;
 }
 
-char Game::evaluate(Point pt, Tile origin_tile)
+char Game::evaluate(Point pt, Tile tl)
 {
   char max = 0;
   char buff;
-  buff = this->evaluateDir(pt, NORTH, origin_tile)
-        + this->evaluateDir(pt, SOUTH, origin_tile);
+  buff = this->evaluateDir(pt, NORTH, tl) + this->evaluateDir(pt, SOUTH, tl);
   if (buff > max)
     max = buff;
-  buff = this->evaluateDir(pt, NORTH_EAST, origin_tile)
-        + this->evaluateDir(pt, SOUTH_WEST, origin_tile);
+  buff = this->evaluateDir(pt, NORTH_EAST, tl) + this->evaluateDir(pt, SOUTH_WEST, tl);
   if (buff > max)
     max = buff;
-  buff = this->evaluateDir(pt, SOUTH_EAST, origin_tile)
-          + this->evaluateDir(pt, NORTH_WEST, origin_tile);
+  buff = this->evaluateDir(pt, SOUTH_EAST, tl) + this->evaluateDir(pt, NORTH_WEST, tl);
+  if (buff > max)
+    max = buff;
+  buff = this->evaluateDir(pt, WEST, tl) + this->evaluateDir(pt, EAST, tl);
   if (buff > max)
     max = buff;
   return max;
