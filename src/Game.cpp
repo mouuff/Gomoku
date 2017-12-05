@@ -66,28 +66,28 @@ char Game::evaluateDir(Point origin, Dir dir, Tile origin_tile)
   Point ptdir = this->directionToPoint(dir);
   Point pos = origin;
   Point size = protocol->mapSize();
+  Tile buff;
   char score = 0;
-  bool gap = false;
   if (origin_tile == EMPTY)
     throw std::runtime_error("Evaluate empty pos");
   //protocol->log("Debug: " + std::to_string(pos.x) + ", " + std::to_string(pos.y));
-  for (int x = 0; x < 4; x += 1) {
+  for (int x = 0; x < LINE_SIZE - 1; x += 1) {
     pos.x += ptdir.x;
     pos.y += ptdir.y;
     if (pos.x < 0 || pos.x >= size.x || pos.y < 0 || pos.y >= size.y)
       break;
-    if (protocol->mapGet(pos) == origin_tile) {
+    buff = protocol->mapGet(pos);
+    if (buff == origin_tile) {
       score += 2;
-      if (gap) {
-        gap = false;
-        score += 1;
-      }
     }
-    else if (gap == false) {
-      gap = true;
+    else if (buff == EMPTY) {
+      score += 1;
     }
     else {
       break;
+    }
+    if (!(x < LINE_SIZE - 1)) {
+      return 0;
     }
   }
   return score;

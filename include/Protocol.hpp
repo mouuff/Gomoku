@@ -7,6 +7,7 @@
 #include "IGame.hpp"
 
 #define MIN_SIZE 5
+#define LINE_SIZE 5
 
 enum Tile : int {
   EMPTY = 0,
