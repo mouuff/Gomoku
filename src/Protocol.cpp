@@ -7,6 +7,9 @@
 #include "Point.hpp"
 #include "misc.h"
 
+//rm:
+#include "Game.hpp"
+
 Protocol::Protocol(IGame* _game)
 {
   this->game = _game;
@@ -119,6 +122,10 @@ void Protocol::inputTurn(std::string const & str)
   pt.x = (char)my_stol(elems.at(0));
   pt.y = (char)my_stol(elems.at(1));
   this->mapGet(pt) = OPPONENT;
+
+  //DEBUG:
+  this->log("evaluate: " + std::to_string((int)((Game*)game)->evaluate(pt, OPPONENT)));
+  //DEBUG
   this->play();
 }
 
@@ -126,7 +133,7 @@ void Protocol::play()
 {
   Point move = game->play();
   this->mapGet(move) = OWN;
-  this->logMap();
+  //this->logMap();
   this->rawSend(std::to_string(move.x) + "," + std::to_string(move.y));
 }
 
