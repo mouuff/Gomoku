@@ -20,6 +20,29 @@ void Game::end()
 
 }
 
+VPoint Game::mapIterator(int deepth) {
+  register Point pt = Point();
+  register VPoint win = VPoint();
+  for (pt.x = 0; pt.x < protocol->mapSize().x ; pt.x++) {
+    for (pt.y = 0; pt.y < protocol->mapSize().y ; pt.y++) {
+      if (deepth % 2 == 0)
+        protocol->mapGet(pt) = Tile::OWN;
+      else
+        protocol->mapGet(pt) = Tile::OPPONENT;
+      if (deepth != 0)
+      {
+        //evaluate
+        mapIterator(deepth--);
+        //evaluate - ret
+      }
+      else
+        (void)pt;//evaluate();
+      protocol->mapGet(pt) = Tile::EMPTY;
+    }
+  }
+  return win;
+}
+
 Point Game::play()
 {
   Point pt = Point();

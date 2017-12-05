@@ -14,4 +14,5 @@ public:
   void start(Protocol*);
   void end();
   Point play();
+  VPoint mapIterator(int);
 };
