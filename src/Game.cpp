@@ -42,16 +42,13 @@ VPoint Game::mapIterator(int deepth) {
         tmp = mapIterator(--deepth);
         //attackEvaluate(pt, player);
       }
-      // else
-      // {
-        val = attackEvaluate(pt, OWN);
+        val = evaluate(pt, ATTACK);
         if (win.v < val)
         {
           win.v = val;
           win.x = pt.x;
           win.y = pt.y;
         }
-      //}
       protocol->mapGet(pt) = Tile::EMPTY;
     }
   }
@@ -101,7 +98,7 @@ Point Game::directionToPoint(Dir dir) const
   return pt;
 }
 
-Attack Game::attackEvaluateDir(Point pos, Dir dir, Tile origin_tile)
+Attack Game::evaluateDir(Point pos, Dir dir, Eval eval, Tile team)
 {
   Point ptdir = this->directionToPoint(dir);
   Point size = protocol->mapSize();
@@ -115,37 +112,69 @@ Attack Game::attackEvaluateDir(Point pos, Dir dir, Tile origin_tile)
     if (pos.x < 0 || pos.x >= size.x || pos.y < 0 || pos.y >= size.y)
       break;
     buff = protocol->mapGet(pos);
-    if (buff == origin_tile) {
-      attack.score += 3;
+    if (eval == ATTACK)
+    {
+      if (buff == team) {
+        attack.score += EVAL_RANGE;
+      }
+      else if (buff == EMPTY) {
+        attack.score += 1;
+      }
+      else {
+        break;
+      }
     }
-    else if (buff == EMPTY) {
-      attack.score += 1;
-    }
-    else {
-      break;
+    else if (eval == DEFENSE){
+      if (buff == team) {
+        attack.score += EVAL_RANGE;
+      }
+      else {
+        break;
+      }
     }
   }
   return attack;
 }
 
-int Game::attackEvaluate(Point pt, Tile tl)
+int Game::evaluate(Point pt, Eval eval, Tile tl)
 {
+  if (tl == EMPTY) {
+    if (eval == ATTACK)
+      tl = OWN;
+    else
+      tl = OPPONENT;
+  }
   Attack max;
   Attack buff;
   max.x = 0;
   max.score = 0;
-  buff = this->attackEvaluateDir(pt, NORTH, tl) + this->attackEvaluateDir(pt, SOUTH, tl);
-  if (buff.x >= EVAL_RANGE && buff.score > max.score)
-    max = buff;
-  buff = this->attackEvaluateDir(pt, NORTH_EAST, tl) + this->attackEvaluateDir(pt, SOUTH_WEST, tl);
-  if (buff.x >= EVAL_RANGE && buff.score > max.score)
-    max = buff;
-  buff = this->attackEvaluateDir(pt, SOUTH_EAST, tl) + this->attackEvaluateDir(pt, NORTH_WEST, tl);
-  if (buff.x >= EVAL_RANGE && buff.score > max.score)
-    max = buff;
-  buff = this->attackEvaluateDir(pt, WEST, tl) + this->attackEvaluateDir(pt, EAST, tl);
-  if (buff.x >= EVAL_RANGE && buff.score > max.score)
-    max = buff;
+  if (eval == ATTACK) {
+    buff = this->evaluateDir(pt, NORTH, eval, tl) + this->evaluateDir(pt, SOUTH, eval, tl);
+    if ((buff.x >= EVAL_RANGE && buff.score > max.score)
+      max = buff;
+    buff = this->evaluateDir(pt, NORTH_EAST, eval, tl) + this->evaluateDir(pt, SOUTH_WEST, eval, tl);
+    if ((buff.x >= EVAL_RANGE && buff.score > max.score)
+      max = buff;
+    buff = this->evaluateDir(pt, SOUTH_EAST, eval, tl) + this->evaluateDir(pt, NORTH_WEST, eval, tl);
+    if ((buff.x >= EVAL_RANGE && buff.score > max.score)
+      max = buff;
+    buff = this->evaluateDir(pt, WEST, eval, tl) + this->evaluateDir(pt, EAST, eval, tl);
+    if ((buff.x >= EVAL_RANGE && buff.score > max.score)
+      max = buff;
+  } else if (eval == DEFENSE){
+    buff = this->evaluateDir(pt, NORTH, eval, tl) + this->evaluateDir(pt, SOUTH, eval, tl);
+    if (buff.score > max.score)
+      max = buff;
+    buff = this->evaluateDir(pt, NORTH_EAST, eval, tl) + this->evaluateDir(pt, SOUTH_WEST, eval, tl);
+    if (buff.score > max.score)
+      max = buff;
+    buff = this->evaluateDir(pt, SOUTH_EAST, eval, tl) + this->evaluateDir(pt, NORTH_WEST, eval, tl);
+    if (buff.score > max.score)
+      max = buff;
+    buff = this->evaluateDir(pt, WEST, eval, tl) + this->evaluateDir(pt, EAST, eval, tl);
+    if (buff.score > max.score)
+      max = buff;
+  }
   return max.score;
 }
 

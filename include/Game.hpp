@@ -20,6 +20,12 @@ enum Dir : int
   NORTH_WEST
 };
 
+enum Eval : int
+{
+  ATTACK = 0,
+  DEFENSE
+};
+
 struct Attack {
   int x;//0 to 4
   int score;
@@ -42,7 +48,7 @@ public:
   Point play();
   VPoint mapIterator(int);
   Point randomEmptyPoint();
-  Attack Game::attackEvaluateDir(Point pos, Dir dir, Tile origin_tile);
-  int attackEvaluate(Point pt, Tile origin_tile = OWN);
+  Attack Game::evaluateDir(Point pos, Dir dir, Eval eval, Tile origin_tile);
+  int evaluate(Point pt, Eval eval, Tile origin_tile = EMPTY);
   Point directionToPoint(Dir dir) const;
 };
