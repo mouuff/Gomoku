@@ -25,17 +25,17 @@ VPoint Game::mapIterator(int deepth) {
   register VPoint win = VPoint();
   register VPoint tmp = VPoint();
   Tile player;
-  Eval eval;
+  TEval type;
   int val;
 
   win.v = 0;
   tmp.v = 0;
   if (deepth % 2 != 0) {
     player = Tile::OWN;
-    eval = ATTACK;
+    type = ATTACK;
   } else {
     player = Tile::OPPONENT;
-    eval = DEFENSE;
+    type = DEFENSE;
   }
   for (pt.x = 0; pt.x < protocol->mapSize().x ; pt.x += 1) {
     for (pt.y = 0; pt.y < protocol->mapSize().y ; pt.y += 1) {
@@ -99,75 +99,75 @@ Point Game::directionToPoint(Dir dir) const
   return pt;
 }
 
-Attack Game::evaluateDir(Point pos, Dir dir, Eval eval, Tile team)
+Eval Game::evaluateDir(Point pos, Dir dir, TEval type, Tile team)
 {
   Point ptdir = this->directionToPoint(dir);
   Point size = protocol->mapSize();
   Tile buff;
-  Attack attack;
-  attack.score = 0;
+  Eval eval;
+  eval.score = 0;
   //protocol->log("Debug: " + std::to_string(pos.x) + ", " + std::to_string(pos.y));
-  for (attack.x = 0; attack.x < EVAL_RANGE; attack.x += 1) {
+  for (eval.x = 0; eval.x < EVAL_RANGE; eval.x += 1) {
     pos.x += ptdir.x;
     pos.y += ptdir.y;
     if (pos.x < 0 || pos.x >= size.x || pos.y < 0 || pos.y >= size.y)
       break;
     buff = protocol->mapGet(pos);
-    if (eval == ATTACK)
+    if (type == ATTACK)
     {
       if (buff == team) {
-        attack.score += EVAL_RANGE;
+        eval.score += EVAL_RANGE;
       }
       else if (buff == EMPTY) {
-        attack.score += 1;
+        eval.score += 1;
       }
       else {
         break;
       }
     }
-    else if (eval == DEFENSE){
+    else if (type == DEFENSE){
       if (buff == team) {
-        attack.score += EVAL_RANGE;
+        eval.score += EVAL_RANGE;
       }
       else {
         break;
       }
     }
   }
-  return attack;
+  return eval;
 }
 
-Attack Game::evaluateSum(Point pt, Dir dir1, Dir dir2, Eval eval, Tile tl)
+Eval Game::evaluateSum(Point pt, Dir dir1, Dir dir2, TEval type, Tile tl)
 {
-  return (this->evaluateDir(pt, dir1, eval, tl)
-          + this->evaluateDir(pt, dir2, eval, tl));
+  return (this->evaluateDir(pt, dir1, type, tl)
+          + this->evaluateDir(pt, dir2, type, tl));
 }
 
-int Game::evaluate(Point pt, Eval eval, Tile tl)
+int Game::evaluate(Point pt, TEval type, Tile tl)
 {
   if (tl == EMPTY) {
-    tl = (eval == ATTACK ? OWN : OPPONENT);
+    tl = (type == ATTACK ? OWN : OPPONENT);
   }
-  Attack attacks[] = {
-    this->evaluateSum(pt, NORTH, SOUTH, eval, tl),
-    this->evaluateSum(pt, NORTH_EAST, SOUTH_WEST, eval, tl),
-    this->evaluateSum(pt, SOUTH_EAST, NORTH_WEST, eval, tl),
-    this->evaluateSum(pt, WEST, EAST, eval, tl)
+  Eval evals[] = {
+    this->evaluateSum(pt, NORTH, SOUTH, type, tl),
+    this->evaluateSum(pt, NORTH_EAST, SOUTH_WEST, type, tl),
+    this->evaluateSum(pt, SOUTH_EAST, NORTH_WEST, type, tl),
+    this->evaluateSum(pt, WEST, EAST, type, tl)
   };
-  Attack max;
-  Attack* buff;
+  Eval max;
+  Eval* buff;
   max.x = 0;
   max.score = 0;
-  if (eval == ATTACK) {
+  if (type == ATTACK) {
     for (int x = 0; x < 4; x += 1) {
-      buff = &(attacks[x]);
+      buff = &(evals[x]);
       if (buff->x >= EVAL_RANGE && buff->score > max.score)
         max = *buff;
     }
   }
-  else if (eval == DEFENSE){
+  else if (type == DEFENSE){
     for (int x = 0; x < 4; x += 1) {
-      buff = &(attacks[x]);
+      buff = &(evals[x]);
       if (buff->score > max.score)
         max = *buff;
     }

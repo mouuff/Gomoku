@@ -20,18 +20,18 @@ enum Dir : int
   NORTH_WEST
 };
 
-enum Eval : int
+enum TEval : int
 {
   ATTACK = 0,
   DEFENSE
 };
 
-struct Attack {
+struct Eval {
   int x;//0 to 4
   int score;
-  Attack& operator+(Attack const & attack) {
-    this->x += attack.x;
-    this->score += attack.score;
+  Eval& operator+(Eval const & Eval) {
+    this->x += Eval.x;
+    this->score += Eval.score;
     return *this;
   }
 };
@@ -48,11 +48,11 @@ public:
   Point play();
   VPoint mapIterator(int);
   Point randomEmptyPoint();
-  //GameEval:
+  //Game Eval:
 protected:
   Point directionToPoint(Dir dir) const;
-  Attack evaluateDir(Point pos, Dir dir, Eval eval, Tile origin_tile);
-  Attack evaluateSum(Point pt, Dir dir1, Dir dir2, Eval eval, Tile tl);
+  Eval evaluateDir(Point pos, Dir dir, TEval type, Tile origin_tile);
+  Eval evaluateSum(Point pt, Dir dir1, Dir dir2, TEval type, Tile tl);
 public:
-  int evaluate(Point pt, Eval eval, Tile origin_tile = EMPTY);
+  int evaluate(Point pt, TEval eval, Tile origin_tile = EMPTY);
 };
