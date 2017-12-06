@@ -61,56 +61,52 @@ Point Game::directionToPoint(Dir dir) const
   return pt;
 }
 
-int Game::attackEvaluateDir(Point origin, Dir dir, Tile origin_tile)
+Attack Game::attackEvaluateDir(Point pos, Dir dir, Tile origin_tile)
 {
   Point ptdir = this->directionToPoint(dir);
-  Point pos = origin;
   Point size = protocol->mapSize();
   Tile buff;
-  int x;
-  int score = 0;
-  if (origin_tile == EMPTY)
-    throw std::runtime_error("attackEvaluate empty pos");
+  Attack attack;
+  attack.score = 0;
   //protocol->log("Debug: " + std::to_string(pos.x) + ", " + std::to_string(pos.y));
-  for (x = 0; x < LINE_SIZE - 1; x += 1) {
+  for (attack.x = 0; attack.x < EVAL_RANGE; attack.x += 1) {
     pos.x += ptdir.x;
     pos.y += ptdir.y;
     if (pos.x < 0 || pos.x >= size.x || pos.y < 0 || pos.y >= size.y)
       break;
     buff = protocol->mapGet(pos);
     if (buff == origin_tile) {
-      score += 2;
+      attack.score += 3;
     }
     else if (buff == EMPTY) {
-      score += 1;
+      attack.score += 1;
     }
     else {
       break;
     }
   }
-  if (x < LINE_SIZE - 1) {
-    return 0;
-  }
-  return score;
+  return attack;
 }
 
 int Game::attackEvaluate(Point pt, Tile tl)
 {
-  int max = 0;
-  int buff;
+  Attack max;
+  Attack buff;
+  max.x = 0;
+  max.score = 0;
   buff = this->attackEvaluateDir(pt, NORTH, tl) + this->attackEvaluateDir(pt, SOUTH, tl);
-  if (buff > max)
+  if (buff.x >= EVAL_RANGE && buff.score > max.score)
     max = buff;
   buff = this->attackEvaluateDir(pt, NORTH_EAST, tl) + this->attackEvaluateDir(pt, SOUTH_WEST, tl);
-  if (buff > max)
+  if (buff.x >= EVAL_RANGE && buff.score > max.score)
     max = buff;
   buff = this->attackEvaluateDir(pt, SOUTH_EAST, tl) + this->attackEvaluateDir(pt, NORTH_WEST, tl);
-  if (buff > max)
+  if (buff.x >= EVAL_RANGE && buff.score > max.score)
     max = buff;
   buff = this->attackEvaluateDir(pt, WEST, tl) + this->attackEvaluateDir(pt, EAST, tl);
-  if (buff > max)
+  if (buff.x >= EVAL_RANGE && buff.score > max.score)
     max = buff;
-  return max;
+  return max.score;
 }
 
 Point Game::randomEmptyPoint()
