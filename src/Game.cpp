@@ -61,7 +61,7 @@ Point Game::directionToPoint(Dir dir) const
   return pt;
 }
 
-int Game::evaluateDir(Point origin, Dir dir, Tile origin_tile)
+int Game::attackEvaluateDir(Point origin, Dir dir, Tile origin_tile)
 {
   Point ptdir = this->directionToPoint(dir);
   Point pos = origin;
@@ -69,7 +69,7 @@ int Game::evaluateDir(Point origin, Dir dir, Tile origin_tile)
   Tile buff;
   int score = 0;
   if (origin_tile == EMPTY)
-    throw std::runtime_error("Evaluate empty pos");
+    throw std::runtime_error("attackEvaluate empty pos");
   //protocol->log("Debug: " + std::to_string(pos.x) + ", " + std::to_string(pos.y));
   for (int x = 0; x < LINE_SIZE - 1; x += 1) {
     pos.x += ptdir.x;
@@ -78,7 +78,7 @@ int Game::evaluateDir(Point origin, Dir dir, Tile origin_tile)
       break;
     buff = protocol->mapGet(pos);
     if (buff == origin_tile) {
-      score += 2;
+      score += 3;
     }
     else if (buff == EMPTY) {
       score += 1;
@@ -93,20 +93,20 @@ int Game::evaluateDir(Point origin, Dir dir, Tile origin_tile)
   return score;
 }
 
-int Game::evaluate(Point pt, Tile tl)
+int Game::attackEvaluate(Point pt, Tile tl)
 {
   int max = 0;
   int buff;
-  buff = this->evaluateDir(pt, NORTH, tl) + this->evaluateDir(pt, SOUTH, tl);
+  buff = this->attackEvaluateDir(pt, NORTH, tl) + this->attackEvaluateDir(pt, SOUTH, tl);
   if (buff > max)
     max = buff;
-  buff = this->evaluateDir(pt, NORTH_EAST, tl) + this->evaluateDir(pt, SOUTH_WEST, tl);
+  buff = this->attackEvaluateDir(pt, NORTH_EAST, tl) + this->attackEvaluateDir(pt, SOUTH_WEST, tl);
   if (buff > max)
     max = buff;
-  buff = this->evaluateDir(pt, SOUTH_EAST, tl) + this->evaluateDir(pt, NORTH_WEST, tl);
+  buff = this->attackEvaluateDir(pt, SOUTH_EAST, tl) + this->attackEvaluateDir(pt, NORTH_WEST, tl);
   if (buff > max)
     max = buff;
-  buff = this->evaluateDir(pt, WEST, tl) + this->evaluateDir(pt, EAST, tl);
+  buff = this->attackEvaluateDir(pt, WEST, tl) + this->attackEvaluateDir(pt, EAST, tl);
   if (buff > max)
     max = buff;
   return max;
@@ -116,7 +116,6 @@ Point Game::randomEmptyPoint()
 {
   Point pt;
   do {
-    if (true)
     pt.x = my_randint(0, protocol->mapSize().x - 1);
     pt.y = my_randint(0, protocol->mapSize().y - 1);
   } while (protocol->mapGet(pt) != Tile::EMPTY);
@@ -136,7 +135,7 @@ Point Game::play()
   for (curr.y = 0; curr.y < size.y; curr.y += 1) {
     for (curr.x = 0; curr.x < size.x; curr.x += 1) {
       if (protocol->mapGet(curr) == EMPTY) {
-        int buff = evaluate(curr, OPPONENT);
+        int buff = attackEvaluate(curr, OWN);
         if (buff > max)
         {
           pt = curr;

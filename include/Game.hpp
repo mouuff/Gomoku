@@ -28,7 +28,7 @@ public:
   void end();
   Point play();
   Point randomEmptyPoint();
-  int evaluateDir(Point pt, Dir dir, Tile origin_tile);
-  int evaluate(Point pt, Tile origin_tile);
+  int attackEvaluateDir(Point pt, Dir dir, Tile origin_tile);
+  int attackEvaluate(Point pt, Tile origin_tile = OWN);
   Point directionToPoint(Dir dir) const;
 };
