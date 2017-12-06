@@ -125,7 +125,7 @@ void Protocol::inputTurn(std::string const & str)
 
   //DEBUG:
   //this->logMap();
-  this->log("evaluate: " + std::to_string((int)((Game*)game)->evaluate(pt, OPPONENT)));
+  this->log("evaluate: " + std::to_string((int)((Game*)game)->attackEvaluate(pt, OWN)));
   //DEBUG
   this->play();
 }
