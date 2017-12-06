@@ -25,35 +25,36 @@ VPoint Game::mapIterator(int deepth) {
   register VPoint win = VPoint();
   register VPoint tmp = VPoint();
   Tile player;
+  Eval eval;
   int val;
 
   win.v = 0;
-  if (deepth % 2 != 0)
+  tmp.v = 0;
+  if (deepth % 2 != 0) {
     player = Tile::OWN;
-  else
+    eval = ATTACK;
+  } else {
     player = Tile::OPPONENT;
+    eval = DEFENSE;
+  }
   for (pt.x = 0; pt.x < protocol->mapSize().x ; pt.x += 1) {
     for (pt.y = 0; pt.y < protocol->mapSize().y ; pt.y += 1) {
-      if (protocol->mapGet(pt) != Tile::EMPTY)
-        continue;
-      protocol->mapGet(pt) = player;
-      if (deepth != 0)
-      {
-        tmp = mapIterator(--deepth);
-        //attackEvaluate(pt, player);
-      }
-        val = evaluate(pt, ATTACK);
-        if (win.v < val)
-        {
-          win.v = val;
-          win.x = pt.x;
-          win.y = pt.y;
+      if (protocol->mapGet(pt) == Tile::EMPTY) {
+        protocol->mapGet(pt) = player;
+        val = evaluate(pt, ATTACK) + (evaluate(pt, DEFENSE) * 10);
+        if (deepth != 0) {
+          tmp = mapIterator((deepth - 1));
         }
-      protocol->mapGet(pt) = Tile::EMPTY;
+        if (win.v < val - (tmp.v / 2)) {
+          win.v = val;
+          win.pt = pt;
+        }
+        protocol->mapGet(pt) = Tile::EMPTY;
+      }
     }
   }
-  protocol->log("Debug " + std::to_string(win.x) + ", " + std::to_string(win.y) + ", " + std::to_string(win.v));
-  //protocol->log("Debug " + std::to_string(pt.x) + ", " + std::to_string(pt.y));
+  // protocol->log("Debug " + std::to_string(win.pt.x) + ", " + std::to_string(win.pt.y) + ", " + std::to_string(win.v) + ", deepth =" + std::to_string(deepth));
+  // protocol->log("Debug " + std::to_string(pt.x) + ", " + std::to_string(pt.y));
   return win;
 }
 
@@ -150,16 +151,16 @@ int Game::evaluate(Point pt, Eval eval, Tile tl)
   max.score = 0;
   if (eval == ATTACK) {
     buff = this->evaluateDir(pt, NORTH, eval, tl) + this->evaluateDir(pt, SOUTH, eval, tl);
-    if ((buff.x >= EVAL_RANGE && buff.score > max.score)
+    if (buff.x >= EVAL_RANGE && buff.score > max.score)
       max = buff;
     buff = this->evaluateDir(pt, NORTH_EAST, eval, tl) + this->evaluateDir(pt, SOUTH_WEST, eval, tl);
-    if ((buff.x >= EVAL_RANGE && buff.score > max.score)
+    if (buff.x >= EVAL_RANGE && buff.score > max.score)
       max = buff;
     buff = this->evaluateDir(pt, SOUTH_EAST, eval, tl) + this->evaluateDir(pt, NORTH_WEST, eval, tl);
-    if ((buff.x >= EVAL_RANGE && buff.score > max.score)
+    if (buff.x >= EVAL_RANGE && buff.score > max.score)
       max = buff;
     buff = this->evaluateDir(pt, WEST, eval, tl) + this->evaluateDir(pt, EAST, eval, tl);
-    if ((buff.x >= EVAL_RANGE && buff.score > max.score)
+    if (buff.x >= EVAL_RANGE && buff.score > max.score)
       max = buff;
   } else if (eval == DEFENSE){
     buff = this->evaluateDir(pt, NORTH, eval, tl) + this->evaluateDir(pt, SOUTH, eval, tl);
@@ -202,7 +203,7 @@ Point Game::play()
   // for (curr.y = 0; curr.y < size.y; curr.y += 1) {
   //   for (curr.x = 0; curr.x < size.x; curr.x += 1) {
   //     if (protocol->mapGet(curr) == EMPTY) {
-  //       int buff = attackEvaluate(curr, OWN);
+  //       int buff = evaluate(curr, ATTACK);
   //       if (buff > max)
   //       {
   //         pt = curr;
@@ -215,8 +216,6 @@ Point Game::play()
   if (win.v == 0) {
     return randomEmptyPoint();
   }
-  protocol->log("Debug " + std::to_string(win.x) + ", " + std::to_string(win.y));
-  pt.x = win.x;
-  pt.y = win.y;
-  return pt;
+  protocol->log("Debug " + std::to_string(win.pt.x) + ", " + std::to_string(win.pt.y));
+  return win.pt;
 }

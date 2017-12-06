@@ -8,7 +8,6 @@ struct Point
 
 struct  VPoint
 {
-  char x;
-  char y;
+  Point pt;
   char v;
 };
