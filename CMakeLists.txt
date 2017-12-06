@@ -7,6 +7,7 @@ add_executable (pbrain-pd35
   src/main.cpp
   src/misc.cpp
   src/Game.cpp
+  src/GameEval.cpp
   src/Protocol.cpp
 )
 

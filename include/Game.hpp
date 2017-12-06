@@ -46,13 +46,15 @@ public:
   void start(Protocol*);
   void end();
   Point play();
-  VPoint mapIterator(int);
   Point randomEmptyPoint();
+  //Game Brain:
+protected:
+  VPoint mapIterator(int);
   //Game Eval:
 protected:
   Point directionToPoint(Dir dir) const;
-  Eval evaluateDir(Point pos, Dir dir, TEval type, Tile origin_tile);
-  Eval evaluateSum(Point pt, Dir dir1, Dir dir2, TEval type, Tile tl);
+  Eval evaluateDir(Point pos, Dir dir, TEval type, Tile team);
+  Eval evaluateSum(Point pt, Dir dir1, Dir dir2, TEval type, Tile team);
 public:
-  int evaluate(Point pt, TEval eval, Tile origin_tile = EMPTY);
+  int evaluate(Point pt, TEval eval, Tile team = EMPTY);
 };
