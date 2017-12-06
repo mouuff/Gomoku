@@ -48,7 +48,11 @@ public:
   Point play();
   VPoint mapIterator(int);
   Point randomEmptyPoint();
-  Attack Game::evaluateDir(Point pos, Dir dir, Eval eval, Tile origin_tile);
-  int evaluate(Point pt, Eval eval, Tile origin_tile = EMPTY);
+  //GameEval:
+protected:
   Point directionToPoint(Dir dir) const;
+  Attack evaluateDir(Point pos, Dir dir, Eval eval, Tile origin_tile);
+  Attack evaluateSum(Point pt, Dir dir1, Dir dir2, Eval eval, Tile tl);
+public:
+  int evaluate(Point pt, Eval eval, Tile origin_tile = EMPTY);
 };

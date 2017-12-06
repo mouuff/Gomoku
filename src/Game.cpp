@@ -137,44 +137,40 @@ Attack Game::evaluateDir(Point pos, Dir dir, Eval eval, Tile team)
   return attack;
 }
 
+Attack Game::evaluateSum(Point pt, Dir dir1, Dir dir2, Eval eval, Tile tl)
+{
+  return (this->evaluateDir(pt, dir1, eval, tl)
+          + this->evaluateDir(pt, dir2, eval, tl));
+}
+
 int Game::evaluate(Point pt, Eval eval, Tile tl)
 {
   if (tl == EMPTY) {
-    if (eval == ATTACK)
-      tl = OWN;
-    else
-      tl = OPPONENT;
+    tl = (eval == ATTACK ? OWN : OPPONENT);
   }
+  Attack attacks[] = {
+    this->evaluateSum(pt, NORTH, SOUTH, eval, tl),
+    this->evaluateSum(pt, NORTH_EAST, SOUTH_WEST, eval, tl),
+    this->evaluateSum(pt, SOUTH_EAST, NORTH_WEST, eval, tl),
+    this->evaluateSum(pt, WEST, EAST, eval, tl)
+  };
   Attack max;
-  Attack buff;
+  Attack* buff;
   max.x = 0;
   max.score = 0;
   if (eval == ATTACK) {
-    buff = this->evaluateDir(pt, NORTH, eval, tl) + this->evaluateDir(pt, SOUTH, eval, tl);
-    if (buff.x >= EVAL_RANGE && buff.score > max.score)
-      max = buff;
-    buff = this->evaluateDir(pt, NORTH_EAST, eval, tl) + this->evaluateDir(pt, SOUTH_WEST, eval, tl);
-    if (buff.x >= EVAL_RANGE && buff.score > max.score)
-      max = buff;
-    buff = this->evaluateDir(pt, SOUTH_EAST, eval, tl) + this->evaluateDir(pt, NORTH_WEST, eval, tl);
-    if (buff.x >= EVAL_RANGE && buff.score > max.score)
-      max = buff;
-    buff = this->evaluateDir(pt, WEST, eval, tl) + this->evaluateDir(pt, EAST, eval, tl);
-    if (buff.x >= EVAL_RANGE && buff.score > max.score)
-      max = buff;
-  } else if (eval == DEFENSE){
-    buff = this->evaluateDir(pt, NORTH, eval, tl) + this->evaluateDir(pt, SOUTH, eval, tl);
-    if (buff.score > max.score)
-      max = buff;
-    buff = this->evaluateDir(pt, NORTH_EAST, eval, tl) + this->evaluateDir(pt, SOUTH_WEST, eval, tl);
-    if (buff.score > max.score)
-      max = buff;
-    buff = this->evaluateDir(pt, SOUTH_EAST, eval, tl) + this->evaluateDir(pt, NORTH_WEST, eval, tl);
-    if (buff.score > max.score)
-      max = buff;
-    buff = this->evaluateDir(pt, WEST, eval, tl) + this->evaluateDir(pt, EAST, eval, tl);
-    if (buff.score > max.score)
-      max = buff;
+    for (int x = 0; x < 4; x += 1) {
+      buff = &(attacks[x]);
+      if (buff->x >= EVAL_RANGE && buff->score > max.score)
+        max = *buff;
+    }
+  }
+  else if (eval == DEFENSE){
+    for (int x = 0; x < 4; x += 1) {
+      buff = &(attacks[x]);
+      if (buff->score > max.score)
+        max = *buff;
+    }
   }
   return max.score;
 }
@@ -197,25 +193,27 @@ Point Game::play()
     std::cout << "MESSAGE protocol not set in game" << std::endl;
     return pt;
   }
-  //Point size = protocol->mapSize();
-  //Point curr;
-  //char max = 0;
-  // for (curr.y = 0; curr.y < size.y; curr.y += 1) {
-  //   for (curr.x = 0; curr.x < size.x; curr.x += 1) {
-  //     if (protocol->mapGet(curr) == EMPTY) {
-  //       int buff = evaluate(curr, ATTACK);
-  //       if (buff > max)
-  //       {
-  //         pt = curr;
-  //         max = buff;
-  //       }
-  //     }
-  //   }
-  // }
+  Point size = protocol->mapSize();
+  Point curr;
+  char max = 0;
+  for (curr.y = 0; curr.y < size.y; curr.y += 1) {
+    for (curr.x = 0; curr.x < size.x; curr.x += 1) {
+      if (protocol->mapGet(curr) == EMPTY) {
+        int buff = evaluate(curr, DEFENSE);
+        if (buff > max) {
+          pt = curr;
+          max = buff;
+        }
+      }
+    }
+  }
+  return pt;
+  /*
   win = mapIterator(1);
   if (win.v == 0) {
     return randomEmptyPoint();
   }
   protocol->log("Debug " + std::to_string(win.pt.x) + ", " + std::to_string(win.pt.y));
   return win.pt;
+  */
 }
