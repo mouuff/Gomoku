@@ -76,7 +76,7 @@ Attack Game::attackEvaluateDir(Point pos, Dir dir, Tile origin_tile)
       break;
     buff = protocol->mapGet(pos);
     if (buff == origin_tile) {
-      attack.score += 3;
+      attack.score += EVAL_RANGE;
     }
     else if (buff == EMPTY) {
       attack.score += 1;
