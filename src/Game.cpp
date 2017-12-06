@@ -67,18 +67,19 @@ int Game::attackEvaluateDir(Point origin, Dir dir, Tile origin_tile)
   Point pos = origin;
   Point size = protocol->mapSize();
   Tile buff;
+  int x;
   int score = 0;
   if (origin_tile == EMPTY)
     throw std::runtime_error("attackEvaluate empty pos");
   //protocol->log("Debug: " + std::to_string(pos.x) + ", " + std::to_string(pos.y));
-  for (int x = 0; x < LINE_SIZE - 1; x += 1) {
+  for (x = 0; x < LINE_SIZE - 1; x += 1) {
     pos.x += ptdir.x;
     pos.y += ptdir.y;
     if (pos.x < 0 || pos.x >= size.x || pos.y < 0 || pos.y >= size.y)
       break;
     buff = protocol->mapGet(pos);
     if (buff == origin_tile) {
-      score += 3;
+      score += 2;
     }
     else if (buff == EMPTY) {
       score += 1;
@@ -86,9 +87,9 @@ int Game::attackEvaluateDir(Point origin, Dir dir, Tile origin_tile)
     else {
       break;
     }
-    if (!(x < LINE_SIZE - 1)) {
-      return 0;
-    }
+  }
+  if (x < LINE_SIZE - 1) {
+    return 0;
   }
   return score;
 }
