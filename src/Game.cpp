@@ -27,6 +27,7 @@ VPoint Game::mapIterator(int deepth) {
   Tile player;
   TEval type;
   int val;
+  int val2;
 
   win.v = 0;
   tmp.v = 0;
@@ -41,11 +42,14 @@ VPoint Game::mapIterator(int deepth) {
     for (pt.y = 0; pt.y < protocol->mapSize().y ; pt.y += 1) {
       if (protocol->mapGet(pt) == Tile::EMPTY) {
         protocol->mapGet(pt) = player;
-        val = evaluate(pt, ATTACK) + (evaluate(pt, DEFENSE) * 10);
+        val = evaluate(pt, ATTACK);
+        val2 = evaluate(pt, DEFENSE);
+        if (val < val2)
+          val = val2;
         if (deepth != 0) {
           tmp = mapIterator((deepth - 1));
         }
-        if (win.v < val - (tmp.v / 2)) {
+        if (win.v < (val - (tmp.v / 2))) {
           win.v = val;
           win.pt = pt;
         }
