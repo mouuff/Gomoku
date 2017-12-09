@@ -47,6 +47,7 @@ class Game : public IGame
 {
 protected:
   Protocol* protocol;
+  bool first;
 public:
   Game();
   virtual ~Game();

@@ -104,7 +104,7 @@ Eval Game::evaluate(Point pt, TEval type, Tile team)
   max.x = 0;
   max.score = 0;
   if (type == ATTACK) {
-    for (int x = 0; x < 4; x += 1) {
+    for (int x = 0; x < EVAL_RANGE; x += 1) {
       buff = &(evals[x]);
       if (buff->x >= EVAL_RANGE && buff->score > max.score)
         max = *buff;

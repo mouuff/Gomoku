@@ -6,12 +6,14 @@
 Game::Game()
 {
   this->protocol = nullptr;
+  first = true;
 }
 
 Game::~Game() {}
 
 void Game::start(Protocol* protocol)
 {
+  first = true;
   this->protocol = protocol;
 }
 
@@ -80,14 +82,21 @@ Point Game::play()
     std::cout << "MESSAGE protocol not set in game" << std::endl;
     return best;
   }
+  if (first) {
+    first = false;
+    best.x = protocol->mapSize().x / 2;
+    best.y = protocol->mapSize().y / 2;
+    for (; best.y < protocol->mapSize().y; best.y += 1) {
+      for (; best.x < protocol->mapSize().x; best.x += 1) {
+        if (protocol->mapGet(best) == EMPTY)
+          return best;
+      }
+    }
+  }
   std::vector<PtEval> best_defenses = evaluateMap(DEFENSE, OPPONENT);
   std::vector<PtEval> best_attacks = evaluateMap(DEFENSE, OWN);
-  protocol->log("A/D "
-                + std::to_string(best_attacks.at(0).eval.score)
-                + " / "
-                + std::to_string(best_defenses.at(0).eval.score));
-  if (best_attacks.at(0).eval.score > best_defenses.at(0).eval.score) {
-    best = evaluateMap(ATTACK).at(0).pt;
+  if (best_attacks.at(0).eval.score >= best_defenses.at(0).eval.score) {
+    best = whoIsTheBest(evaluateMap(ATTACK));
     protocol->log("ATTACK");
   }
   else {
