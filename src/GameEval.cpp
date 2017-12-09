@@ -64,7 +64,7 @@ Eval Game::evaluateDir(Point pos, Dir dir, TEval type, Tile team)
         eval.score += EVAL_RANGE;
       }
       else if (buff == EMPTY) {
-        //eval.score += 1;
+        eval.score += 1;
       }
       else {
         break;
@@ -88,7 +88,7 @@ Eval Game::evaluateSum(Point pt, Dir dir1, Dir dir2, TEval type, Tile team)
           + this->evaluateDir(pt, dir2, type, team));
 }
 
-int Game::evaluate(Point pt, TEval type, Tile team)
+Eval Game::evaluate(Point pt, TEval type, Tile team)
 {
   if (team == EMPTY) {
     team = (type == ATTACK ? OWN : OPPONENT);
@@ -117,5 +117,51 @@ int Game::evaluate(Point pt, TEval type, Tile team)
         max = *buff;
     }
   }
-  return max.score;
+  return max;
+}
+
+std::vector<PtEval> Game::evaluateMap(TEval type, Tile team)
+{
+  Point size = protocol->mapSize();
+  Point curr;
+  PtEval best = PtEval();
+  PtEval buff = PtEval();
+  std::vector<PtEval> bests;
+  for (curr.y = 0; curr.y < size.y; curr.y += 1) {
+    for (curr.x = 0; curr.x < size.x; curr.x += 1) {
+      if (protocol->mapGet(curr) == EMPTY) {
+        buff.eval = evaluate(curr, type, team);
+        buff.pt = curr;
+        if (buff.eval.score >= best.eval.score) {
+          if (buff.eval.score > best.eval.score) {
+            bests.clear();
+          }
+          bests.push_back(buff);
+          best = buff;
+        }
+      }
+    }
+  }
+  return bests;
+}
+
+Point Game::whoIsTheBest(std::vector<PtEval> bests)
+{
+  std::vector<PtEval> newbests;
+  PtEval lowest;
+  PtEval best;
+  PtEval buff;
+  bool first = true;
+  for (auto totest : bests) {
+    protocol->mapGet(totest.pt) = OWN;
+    newbests = evaluateMap(DEFENSE, OPPONENT);
+    buff = newbests.at(0);
+    if (first || buff.eval.score < lowest.eval.score) {
+      lowest = buff;
+      best = totest;
+      first = false;
+    }
+    protocol->mapGet(totest.pt) = EMPTY;
+  }
+  return best.pt;
 }

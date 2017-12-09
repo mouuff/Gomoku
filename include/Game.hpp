@@ -36,6 +36,13 @@ struct Eval {
   }
 };
 
+
+struct PtEval
+{
+  Point pt;
+  Eval eval;
+};
+
 class Game : public IGame
 {
 protected:
@@ -56,5 +63,7 @@ protected:
   Eval evaluateDir(Point pos, Dir dir, TEval type, Tile team);
   Eval evaluateSum(Point pt, Dir dir1, Dir dir2, TEval type, Tile team);
 public:
-  int evaluate(Point pt, TEval eval, Tile team = EMPTY);
+  Eval evaluate(Point pt, TEval type, Tile team = EMPTY);
+  std::vector<PtEval> evaluateMap(TEval type, Tile team = EMPTY);
+  Point whoIsTheBest(std::vector<PtEval> bests);
 };

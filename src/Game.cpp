@@ -19,7 +19,7 @@ void Game::end()
 {
 
 }
-
+/*
 VPoint Game::mapIterator(int deepth) {
   register Point pt = Point();
   register VPoint win = VPoint();
@@ -61,7 +61,7 @@ VPoint Game::mapIterator(int deepth) {
   // protocol->log("Debug " + std::to_string(pt.x) + ", " + std::to_string(pt.y));
   return win;
 }
-
+*/
 Point Game::randomEmptyPoint()
 {
   Point pt;
@@ -72,34 +72,29 @@ Point Game::randomEmptyPoint()
   return pt;
 }
 
+
 Point Game::play()
 {
-  VPoint win = VPoint();
-  Point pt = Point();
+  Point best = Point();
   if (protocol == nullptr) {
     std::cout << "MESSAGE protocol not set in game" << std::endl;
-    return pt;
+    return best;
   }
-  Point size = protocol->mapSize();
-  Point curr;
-  char max = 0;
-  for (curr.y = 0; curr.y < size.y; curr.y += 1) {
-    for (curr.x = 0; curr.x < size.x; curr.x += 1) {
-      if (protocol->mapGet(curr) == EMPTY) {
-        int buff = evaluate(curr, ATTACK);
-        if (buff > max) {
-          pt = curr;
-          max = buff;
-        }
-        buff = evaluate(curr, DEFENSE);
-        if (buff >= max) {
-          pt = curr;
-          max = buff;
-        }
-      }
-    }
+  std::vector<PtEval> best_defenses = evaluateMap(DEFENSE, OPPONENT);
+  std::vector<PtEval> best_attacks = evaluateMap(DEFENSE, OWN);
+  protocol->log("A/D "
+                + std::to_string(best_attacks.at(0).eval.score)
+                + " / "
+                + std::to_string(best_defenses.at(0).eval.score));
+  if (best_attacks.at(0).eval.score > best_defenses.at(0).eval.score) {
+    best = evaluateMap(ATTACK).at(0).pt;
+    protocol->log("ATTACK");
   }
-  return pt;
+  else {
+    best = whoIsTheBest(best_defenses);
+    protocol->log("DEFENSE");
+  }
+  return best;
   /*
   win = mapIterator(1);
   if (win.v == 0) {
