@@ -64,7 +64,7 @@ Eval Game::evaluateDir(Point pos, Dir dir, TEval type, Tile team)
         eval.score += EVAL_RANGE;
       }
       else if (buff == EMPTY) {
-        eval.score += 1;
+        //eval.score += 1;
       }
       else {
         break;

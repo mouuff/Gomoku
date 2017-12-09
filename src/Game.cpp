@@ -82,8 +82,13 @@ Point Game::play()
   for (curr.y = 0; curr.y < size.y; curr.y += 1) {
     for (curr.x = 0; curr.x < size.x; curr.x += 1) {
       if (protocol->mapGet(curr) == EMPTY) {
-        int buff = evaluate(curr, DEFENSE);
+        int buff = evaluate(curr, ATTACK);
         if (buff > max) {
+          pt = curr;
+          max = buff;
+        }
+        buff = evaluate(curr, DEFENSE);
+        if (buff >= max) {
           pt = curr;
           max = buff;
         }
