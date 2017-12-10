@@ -79,15 +79,15 @@ Point Game::findMapMiddle()
 
 bool Game::isFirst()
 {
-  bool first = true;
-  Point curr = Point();
-  for (; curr.y < protocol->mapSize().y; curr.y += 1) {
-    for (; curr.x < protocol->mapSize().x; curr.x += 1) {
-      if (protocol->mapGet(curr) != EMPTY)
-        first = false;
+  Point curr;
+  for (curr.y = 0; curr.y < protocol->mapSize().y; curr.y += 1) {
+    for (curr.x = 0; curr.x < protocol->mapSize().x; curr.x += 1) {
+      if (protocol->mapGet(curr) != EMPTY) {
+        return false;
+      }
     }
   }
-  return first;
+  return true;
 }
 
 Point Game::play()
@@ -97,8 +97,9 @@ Point Game::play()
     std::cout << "MESSAGE protocol not set in game" << std::endl;
     return best;
   }
-  if (isFirst())
+  if (this->isFirst()) {
     return findMapMiddle();
+  }
   std::vector<PtEval> best_defenses = evaluateMap(DEFENSE, OPPONENT);
   std::vector<PtEval> best_attacks = evaluateMap(DEFENSE, OWN);
   if (best_attacks.at(0).eval.score >= best_defenses.at(0).eval.score) {
