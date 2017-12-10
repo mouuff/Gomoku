@@ -11,4 +11,4 @@ add_executable (pbrain-pd35
   src/Protocol.cpp
 )
 
-install (TARGETS pbrain-pd35 DESTINATION bin)
+install (TARGETS pbrain-pd35 DESTINATION .)
