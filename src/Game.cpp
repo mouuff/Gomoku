@@ -6,14 +6,12 @@
 Game::Game()
 {
   this->protocol = nullptr;
-  first = true;
 }
 
 Game::~Game() {}
 
 void Game::start(Protocol* protocol)
 {
-  first = true;
   this->protocol = protocol;
 }
 
@@ -64,16 +62,33 @@ VPoint Game::mapIterator(int deepth) {
   return win;
 }
 */
-Point Game::randomEmptyPoint()
+
+Point Game::findMapMiddle()
 {
-  Point pt;
-  do {
-    pt.x = my_randint(0, protocol->mapSize().x - 1);
-    pt.y = my_randint(0, protocol->mapSize().y - 1);
-  } while (protocol->mapGet(pt) != Tile::EMPTY);
-  return pt;
+  Point best;
+  best.x = protocol->mapSize().x / 2;
+  best.y = protocol->mapSize().y / 2;
+  for (; best.y < protocol->mapSize().y; best.y += 1) {
+    for (; best.x < protocol->mapSize().x; best.x += 1) {
+      if (protocol->mapGet(best) == EMPTY)
+        return best;
+    }
+  }
+  return best;
 }
 
+bool Game::isFirst()
+{
+  bool first = true;
+  Point curr = Point();
+  for (; curr.y < protocol->mapSize().y; curr.y += 1) {
+    for (; curr.x < protocol->mapSize().x; curr.x += 1) {
+      if (protocol->mapGet(curr) != EMPTY)
+        first = false;
+    }
+  }
+  return first;
+}
 
 Point Game::play()
 {
@@ -82,17 +97,8 @@ Point Game::play()
     std::cout << "MESSAGE protocol not set in game" << std::endl;
     return best;
   }
-  if (first) {
-    first = false;
-    best.x = protocol->mapSize().x / 2;
-    best.y = protocol->mapSize().y / 2;
-    for (; best.y < protocol->mapSize().y; best.y += 1) {
-      for (; best.x < protocol->mapSize().x; best.x += 1) {
-        if (protocol->mapGet(best) == EMPTY)
-          return best;
-      }
-    }
-  }
+  if (isFirst())
+    return findMapMiddle();
   std::vector<PtEval> best_defenses = evaluateMap(DEFENSE, OPPONENT);
   std::vector<PtEval> best_attacks = evaluateMap(DEFENSE, OWN);
   if (best_attacks.at(0).eval.score >= best_defenses.at(0).eval.score) {

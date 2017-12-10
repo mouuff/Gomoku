@@ -54,12 +54,13 @@ public:
   void start(Protocol*);
   void end();
   Point play();
-  Point randomEmptyPoint();
   //Game Brain:
 protected:
   VPoint mapIterator(int);
   //Game Eval:
 protected:
+  bool isFirst();
+  Point findMapMiddle();
   Point directionToPoint(Dir dir) const;
   Eval evaluateDir(Point pos, Dir dir, TEval type, Tile team);
   Eval evaluateSum(Point pt, Dir dir1, Dir dir2, TEval type, Tile team);
